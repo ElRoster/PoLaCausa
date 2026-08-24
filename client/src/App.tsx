@@ -556,6 +556,11 @@ function paymentLabel(method: string) {
   return method;
 }
 
+function productImageSrc(imageUrl?: string) {
+  if (!imageUrl) return "";
+  return imageUrl.startsWith("http") ? imageUrl : `${API_URL}${imageUrl}`;
+}
+
 function PeriodFilter({ value, onChange }: { value: Period; onChange: (period: Period) => void }) {
   return (
     <div className="period-filter">
@@ -746,7 +751,7 @@ function Inventory(props: ViewProps) {
         {products.map((product) => (
           <article className="product-card" key={product.id}>
             <div className="product-image">
-              {product.image_url ? <img src={`${API_URL}${product.image_url}`} alt={product.name} /> : <Beer size={42} />}
+              {product.image_url ? <img src={productImageSrc(product.image_url)} alt={product.name} /> : <Beer size={42} />}
             </div>
             <div className="product-body">
               <span className="tag" style={{ "--tag": product.category_color ?? "#f59e0b" } as React.CSSProperties}>
@@ -1269,7 +1274,7 @@ function SaleCheckoutModal({
 function ProductThumb({ product }: { product: Product }) {
   return (
     <div className="sale-product-thumb">
-      {product.image_url ? <img src={`${API_URL}${product.image_url}`} alt={product.name} /> : <Beer size={22} />}
+      {product.image_url ? <img src={productImageSrc(product.image_url)} alt={product.name} /> : <Beer size={22} />}
     </div>
   );
 }

@@ -1,18 +1,12 @@
-import path from "node:path";
 import { Router } from "express";
 import multer from "multer";
 import { z } from "zod";
 import { query } from "../db/pool.js";
 import { requireAuth, requirePermission } from "../middleware/auth.js";
+import { uploadProductImage } from "../services/images.js";
 
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: "uploads",
-    filename: (_req, file, cb) => {
-      const ext = path.extname(file.originalname);
-      cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
-    }
-  }),
+  storage: multer.memoryStorage(),
   fileFilter: (_req, file, cb) => {
     cb(null, file.mimetype.startsWith("image/"));
   },
@@ -74,7 +68,7 @@ router.post(
   async (req, res) => {
     const parsed = productSchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json(parsed.error);
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+    const imageUrl = await uploadProductImage(req.file);
     const p = parsed.data;
     const result = await query(
       `INSERT INTO products
@@ -112,7 +106,7 @@ router.put(
       "SELECT image_url FROM products WHERE id=$1",
       [req.params.id]
     );
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : current.rows[0]?.image_url;
+    const imageUrl = req.file ? await uploadProductImage(req.file) : current.rows[0]?.image_url;
     const p = parsed.data;
     const result = await query(
       `UPDATE products SET

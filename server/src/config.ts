@@ -19,5 +19,10 @@ export const config = {
   clientOrigins: (process.env.CLIENT_URL ?? defaultClientOrigins.join(","))
     .split(",")
     .map((origin) => origin.trim())
-    .filter(Boolean)
+    .filter(Boolean),
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME ?? "",
+    apiKey: process.env.CLOUDINARY_API_KEY ?? "",
+    apiSecret: process.env.CLOUDINARY_API_SECRET ?? ""
+  }
 };
