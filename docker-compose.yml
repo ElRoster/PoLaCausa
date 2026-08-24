@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pola-causa-db
+    restart: unless-stopped
+    ports:
+      - "55432:5432"
+    environment:
+      POSTGRES_USER: polacausa
+      POSTGRES_PASSWORD: polacausa
+      POSTGRES_DB: polacausa
+    volumes:
+      - pola-causa-data:/var/lib/postgresql/data
+
+volumes:
+  pola-causa-data:
