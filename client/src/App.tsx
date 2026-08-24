@@ -590,6 +590,7 @@ function Inventory(props: ViewProps) {
   const [categoryForm, setCategoryForm] = useState({ name: "", color: "#f59e0b" });
   const [modal, setModal] = useState<"product" | "category" | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const canManageProducts = props.currentUser.permissions.includes("all");
 
   async function refresh() {
     const qs = new URLSearchParams({ search, category, stockMode });
@@ -689,6 +690,19 @@ function Inventory(props: ViewProps) {
     if (category === cat.id) setCategory("");
   }
 
+  async function deleteProduct(product: Product) {
+    const confirmed = await props.confirm({
+      title: "Eliminar producto",
+      message: `Eliminar "${product.name}" del inventario. No aparecera en ventas ni en el stock activo.`,
+      confirmText: "Eliminar",
+      cancelText: "Cancelar",
+      tone: "danger"
+    });
+    if (!confirmed) return;
+    const ok = await mutate(props, `/products/${product.id}`, { method: "DELETE" }, refresh);
+    if (ok) props.setSuccess(`Producto "${product.name}" eliminado del inventario.`);
+  }
+
   return (
     <div className="grid-stack">
       <div className="toolbelt">
@@ -744,7 +758,12 @@ function Inventory(props: ViewProps) {
                 <strong>{money.format(Number(product.price))}</strong>
                 <span className={product.stock <= product.min_stock ? "danger" : ""}>{product.stock} uds</span>
               </div>
-              <button className="secondary product-edit" onClick={() => openProductModal(product)}><Edit3 size={16} /> Editar</button>
+              {canManageProducts && (
+                <div className="product-card-actions">
+                  <button className="secondary product-edit" onClick={() => openProductModal(product)}><Edit3 size={16} /> Editar</button>
+                  <button className="secondary danger-action product-edit" onClick={() => deleteProduct(product)}><Trash2 size={16} /> Eliminar</button>
+                </div>
+              )}
             </div>
           </article>
         ))}

@@ -256,7 +256,13 @@ input, select {
   grid-template-rows: 178px minmax(154px, auto);
   align-content: start;
 }
-.product-edit { width: 100%; margin-top: 12px; }
+.product-edit { width: 100%; }
+.product-card-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
 .product-image {
   background:
     radial-gradient(circle at 30% 20%, rgba(255,255,255,.2), transparent 28%),
